@@ -1,22 +1,42 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Feedback, ContactType } from '../shared/feedback';
+import { FeedbackService } from '../services/feedback.service';
+import { switchMap } from 'rxjs/operators';
+import { Params, ActivatedRoute } from '@angular/router';
+import { flyInOut, expand} from '../animations/app.animations';
 @Component({
   selector: 'app-contact',
   templateUrl: './contact.component.html',
-  styleUrls: ['./contact.component.scss']
+  styleUrls: ['./contact.component.scss'],
+  host: {
+    '[@flyInOut]': 'true',
+    'style': 'display: block;'
+    },
+  animations: [
+   flyInOut(),
+   expand()
+  ]
 })
 export class ContactComponent implements OnInit {
   feedbackForm: FormGroup;
   feedback: Feedback;
+  errMess: string;
+  response:boolean;
+  Loading: boolean;
   @ViewChild('fform') feedbackFormDirective;
   contactType = ContactType;
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private feedbackservice: FeedbackService, private route: ActivatedRoute) {
+    this.Loading = false;
+    this.response = false;
     this.createForm();
   }
 
   ngOnInit() {
-   
+    /*this.feedbackservice.submitFeedback(this.feedback)
+    .subscribe(feed => { this.feedback = feed;},
+      errmess => this.errMess = <any>errmess);*/
+     
   }
   //subscribe to the Angular Form observable named valueChanges and initiate form validation
   formErrors = {
@@ -83,7 +103,21 @@ export class ContactComponent implements OnInit {
   }
   onSubmit() {
     this.feedback = this.feedbackForm.value;
-    console.log(this.feedback);
+    this.Loading = true;
+    this.feedbackservice.submitFeedback(this.feedback)
+    .subscribe(feedbacks => {
+      this.feedback = feedbacks;
+    },
+    errmess => { this.feedback = null; this.errMess = <any>errmess; },
+    //function to set timeout
+    () => {
+      this.response = true;
+      setTimeout(() => {
+          this.response = false;
+          this.Loading = false;
+        } , 5000
+      );
+    });
     this.feedbackForm.reset({
       firstname: '',
       lastname: '',

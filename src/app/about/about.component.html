@@ -57,14 +57,18 @@
     <h2>Corporate Leadership</h2>
      <mat-grid-list cols="1" rowHeight="200px">
         <mat-grid-tile *ngFor="let lead of leaders">
-          <img height="80" src={{lead.image}}>
+          <img height="80" src="{{'http://localhost:3000/'+ lead.image}}">
             <p>{{lead.name}} {{lead.abbr}}<br>
                {{lead.designation}}<br>{{lead.description}}<br>
               <p>
         </mat-grid-tile>
       </mat-grid-list>
   </div>
-  <div [hidden]="leaders">
+  <div [hidden]="leaders  || errMess">
     <mat-spinner></mat-spinner><h4>Loading . . . Please Wait</h4>
   </div>
+  <div fxFlex *ngIf="errMess">
+  <h2>Error</h2>
+  <h4>{{errMess}}</h4>
+</div>
 </div>
