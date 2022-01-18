@@ -1,0 +1,83 @@
+<div class="container"
+    fxLayout="row"
+    fxLayout.sm="column"
+    fxLayout.xs="column"
+    fxLayoutAlign.gt-md="space-around center"
+    fxLayoutGap="10px" 
+    fxLayoutGap.xs="0">
+
+  <div fxFlex="40" *ngIf="dish">
+    <div fxFlex >
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>
+            <h3 *ngIf="dish">{{dish.name | uppercase}}</h3>
+          </mat-card-title>
+        </mat-card-header>
+        <img mat-card-image src="{{'http://localhost:3000/' + dish.image}}" alt={{dish.name}}>
+        <mat-card-content>
+          <p>{{dish.description}}
+          </p>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button [routerLink]="['/dishdetail', prev]"><span class="fa fa-chevron-left fa-lg"></span></button>
+          <button mat-button>LIKE</button>
+          <button mat-button>SHARE</button>
+          <button mat-button (click)="goBack()">BACK</button>
+          <span class="flex-spacer"></span>
+        <button mat-button [routerLink]="['/dishdetail', next]"><span class="fa fa-chevron-right fa-lg"></span></button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+    <div [hidden]="dishes || errMess">
+    </div>
+    <div fxFlex *ngIf="errMess">
+      <h2>Error</h2>
+      <h4>{{errMess}}</h4>
+    </div>
+  </div>
+
+  <div fxFlex="40" *ngIf="dish">
+    <div fxFlex>
+      <mat-grid-list cols="2" rowHeight="200px" >
+              <h3>Comments</h3>
+        <mat-grid-tile *ngFor="let d of dish.comments">
+            <p>{{d.comment}}<br>{{d.rating}} Stars <br>
+              -- {{d.author}} {{d.date | date:'mediumDate'}}<br>
+              <p>
+        </mat-grid-tile>
+        <mat-grid-tile  *ngIf="feedbackForm.valid">
+        <p>{{feedbackForm.get('commentView').value}}<br>{{feedbackForm.get('Stars').value }} Stars <br>
+          -- {{feedbackForm.get('name').value }}<br>
+        <p>
+          </mat-grid-tile>
+      </mat-grid-list>
+
+      <mat-grid-list cols="1" rowHeight="600px" >
+        <mat-grid-tile>
+        <div fxFlex fxFlexOffset="20px" class="form-size">
+          <form novalidate [formGroup]="feedbackForm" #fform="ngForm" (ngSubmit)="onSubmit()">
+            <p>
+              <mat-form-field class="half-width">
+                <input matInput formControlName="name" placeholder="Name" type="text" required >
+                <mat-error *ngIf="formErrors.name">{{formErrors.name}}</mat-error>
+              </mat-form-field>
+            </p>
+            <mat-slider thumbLabel  min="1" max="5" formControlName="Stars" ></mat-slider>
+            <p>
+              <mat-form-field class="full-width">
+                <textarea matInput formControlName="commentView" placeholder="Your Comment" rows=12 required></textarea>
+                <mat-error *ngIf="formErrors.commentView">{{formErrors.commentView}}</mat-error>
+              </mat-form-field>
+            </p>
+            <button type="submit" mat-button class="background-primary text-floral-white"  [disabled]="!feedbackForm.valid">Submit</button>
+          </form>
+        </div>
+      </mat-grid-tile>
+      </mat-grid-list>
+    </div>
+    
+  </div>
+
+</div>
+
